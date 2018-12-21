@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>THW Darmstadt Infoscreen</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+</head>
+
+<body>
+<header>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="#">THW Darmstadt Infoscreen</a>
+    </nav>
+</header>
+<div class="container-fluid" style="padding-top:80px; width:100%">
+    <div class="row">
+        <div class="col-3" style="padding: 20px;">
+            <div class="card" style="height: 300px">
+                <div class="card-header">
+                    <h5 class="card-title"><b>Uhrzeit</b></h5></div>
+                <div class="card-body">
+                    <p class="card-text"><div id="uhr"></div>
+                    <p class="card-text"><div id="datum"></div></p>
+                </div>
+                <div class="card-footer text-muted"></div>
+            </div>
+        </div>
+        <div class="col-3" style="padding: 20px;">
+            ## Wetter
+        </div>
+        <div class="col-6" style="padding: 20px;">
+            <div class="card" style="height: 530px">
+                <div class="card-header" >
+                    <h5 class="card-title"><b>Informationen</b>
+                    </h5>
+                </div>
+                <div class="card-body" style="padding: 0px">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Info:</th>
+                        </tr>
+                        </thead>
+                        <tbody id="infostabelle">
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer text-muted">Stand: 30. Januar 2018</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6" style="padding: 20px;">
+            ## Termine
+        </div>
+        <div class="col-3" style="padding: 20px;">
+            <div class="card" style="height: 530px">
+                <div class="card-header" >
+                    <h5 class="card-title"><b>ToDo's</b>
+                    </h5>
+                </div>
+                <div class="card-body" style="padding: 0px">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Datum</th>
+                            <th scope="col">Was?</th>
+                        </tr>
+                        </thead>
+                        <tbody id="todotabelle">
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer text-muted">Stand: 30. Januar 2018</div>
+            </div>
+        </div>
+        <div class="col-3" style="padding: 20px;">
+            <div class="card" style="height: 530px">
+                <div class="card-header" >
+                    <h5 class="card-title"><b>Speisekarte</b>
+                    </h5>
+                </div>
+                <div class="card-body" style="padding: 0px">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Datum</th>
+                            <th scope="col">Mahlzeit</th>
+                        </tr>
+                        </thead>
+                        <tbody id="speisenkartetabelle">
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer text-muted">Stand: 30. Januar 2018</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        var ws;
+        if (window.WebSocket === undefined) {
+            $("#container").append("Your browser does not support WebSockets");
+            return;
+        } else {
+            ws = initWS();
+        }
+        function initWS() {
+            var socket = new WebSocket("ws://localhost:8080/ws"),
+                    container = $("#container")
+            socket.onopen = function() {
+                container.append("<p>Socket is open</p>");
+            };
+            socket.onmessage = function (e) {
+                aktualisiereFelder(e.data);
+            }
+            socket.onclose = function () {
+                container.append("<p>Socket closed</p>");
+            }
+            return socket;
+        }
+        $("#sendBtn").click(function (e) {
+            e.preventDefault();
+            ws.send(JSON.stringify({ Num: parseInt($("#numberfield").val()) }));
+        });
+    });
+    function aktualisiereFelder(json) {
+        var parsed = JSON.parse(json)
+        $.each(parsed, function(index, value) {
+            if (value["title"] == "speisen") {
+                var speisen = value["content"];
+                $.each(speisen, function(index, value) {
+                    var datum = value["datum"];
+                    var essen = value["text"];
+                    var id = value["id"];
+                    $("#speisenkartetabelle").append("<tr>");
+                    $("#speisenkartetabelle").append("<td>" + datum + "</td>");
+                    $("#speisenkartetabelle").append("<td>" + essen + "</td></tr>");
+                })
+            }
+            if (value["title"] == "infos") {
+                var infos = value["content"];
+                $.each(infos, function(index, value) {
+                    var essen = value["text"];
+                    var id = value["id"];
+                    $("#infostabelle").append("<tr><td>" + essen + "</td></tr>");
+                })
+            }
+        })
+    }
+
+
+    // Uhrzeit
+
+    function ticken(){
+        var stunden, minuten, sekunden;
+        var StundenZahl, MinutenZahl, SekundenZahl;
+        var heute;
+        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+        heute = new Date();
+        StundenZahl = heute.getHours();
+        MinutenZahl = heute.getMinutes();
+        SekundenZahl = heute.getSeconds();
+
+        stunden = StundenZahl+":";
+        if (MinutenZahl < 10) {minuten = "0" + MinutenZahl + ":";}
+        else {minuten = MinutenZahl + ":";}
+        if (SekundenZahl < 10) {sekunden = "0" + SekundenZahl + " ";}
+        else {sekunden = SekundenZahl + " ";}
+        zeit = "<a style='font-size: 50px'>" + stunden + minuten + "</a><a style='font-size:25pt'>" + sekunden + " Uhr";
+        datum.innerHTML = heute.toLocaleDateString("de-DE", options);
+        uhr.innerHTML = zeit;
+
+        window.setTimeout("ticken();", 1000);
+    }
+
+    window.onload = ticken;
+</script>
+</body>
+</html>
+
+
+

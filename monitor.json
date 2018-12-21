@@ -1,0 +1,39 @@
+[{
+  "title":"speisen",
+  "content": [
+    {
+      "id":0,
+      "datum":"20.02.2018",
+      "text":"Heute kein Essen"
+    },
+    {
+      "id":1,
+      "datum":"21.08.2018",
+      "text":"Heute kein Essen"
+    }
+  ]},
+  {
+    "title":"infos",
+    "content":[
+      {
+        "id":0,
+        "text":"Für Bereichsausbildungen bitte die GrFü ansprechen"
+      },
+      {
+        "id":1,
+        "text":"Aktueller Stand neue UK: Stadt muss Geländekaufvertrag unterschreiben"
+      },
+      {
+        "id":2,
+        "text":"FmKW wird für die FK am 03.03. abgeholt"
+      }
+    ]},
+  {
+    "title":"todos",
+    "content":[
+      {
+        "id":0,
+        "text":"FK: Feldbetten bitte zurückräumen"
+      }
+    ]}
+]
