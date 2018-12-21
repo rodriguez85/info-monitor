@@ -11,6 +11,7 @@ import (
 	"github.com/taviti/caldav-go/caldav"
 )
 
+
 func main() {
 	// create a reference to your CalDAV-compliant server
 	server, err := caldav.NewServer("URL")
